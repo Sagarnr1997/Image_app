@@ -95,7 +95,8 @@ def main():
     # For face recognition, you can use a library like OpenCV and implement a face detection model.
     # For downloading,
 def display_all_images():
-    blobs = bucket.list_blobs(prefix="images/")
+    blobs_iterator = bucket.list_blobs(prefix="images/")
+    blobs = list(blobs_iterator)
     
     if not blobs:
         st.write("No images found.")
