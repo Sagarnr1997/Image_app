@@ -66,29 +66,6 @@ def generate_qr_code(app_url):
     img = qr.make_image(fill_color="black", back_color="white")
     return img
 
-def main():
-    app_url = "https://your-streamlit-app-url.com"  # Replace this with your actual Streamlit app URL
-
-    st.title('Image Upload and QR Code Generator')
-
-    # Upload image
-    uploaded_file = st.file_uploader("Upload Image", type=['jpg', 'png', 'jpeg'])
-    if uploaded_file:
-        # Display uploaded image
-        st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
-
-        # Upload image to Firebase
-        image_url = upload_image_to_firebase(uploaded_file)
-
-        if image_url:
-            # Generate and display QR code
-            qr_img = generate_qr_code(app_url)
-            st.image(qr_img, caption='QR Code', use_column_width=True)
-
-    # Display all images in Firebase Storage
-    st.subheader("All Images")
-    display_all_images()
-
 def display_all_images():
     blobs_iterator = bucket.list_blobs(prefix="images/")
     blobs = list(blobs_iterator)
@@ -116,7 +93,19 @@ def display_all_images():
 def main():
     app_url = "https://your-streamlit-app-url.com"  # Replace this with your actual Streamlit app URL
 
-    # ...
+    st.title('Image Upload and QR Code Generator')
+
+    # Upload image
+    uploaded_file = st.file_uploader("Upload Image", type=['jpg', 'png', 'jpeg'])
+    if uploaded_file:
+        # Display uploaded image
+        st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
+
+        # Upload image to Firebase
+        if upload_image_to_firebase(uploaded_file):
+            # Generate and display QR code
+            qr_img = generate_qr_code(app_url)
+            st.image(qr_img, caption='QR Code', use_column_width=True)
 
     # Display all images in Firebase Storage
     st.subheader("All Images")
