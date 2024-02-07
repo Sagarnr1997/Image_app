@@ -96,7 +96,7 @@ def main():
     # For downloading,
 def display_all_images():
     blobs = bucket.list_blobs(prefix="images/")
-    cols = st.columns(len(blobs))
+    cols = st.beta_columns(len(blobs))
     download_buttons = []
 
     for idx, blob in enumerate(blobs):
@@ -111,11 +111,7 @@ def display_all_images():
                 mime="image/{}".format(blob.content_type.split("/")[-1]),
             )
             st.form_submit_button("Submit")
-
 def main():
-    # ...
-
-    # Display all images in Firebase Storage
     st.subheader("All Images")
     display_all_images()
 
