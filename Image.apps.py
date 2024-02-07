@@ -12,7 +12,7 @@ from firebase_admin import credentials, storage
 import requests
 
 # Initialize Firebase
-url = "https://raw.githubusercontent.com/Sagarnr1997/Image_app/main/imageapp.json"
+url = "https://sagarnr1997.github.io/firebase_api/imageapp.json"
 # Fetch the contents of the URL
 response = requests.get(url)
 cred = credentials.Certificate(response)
