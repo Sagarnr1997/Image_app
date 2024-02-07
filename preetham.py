@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import firebase_admin
-from firebase_admin import credentials, storage
+from firebase_admin import credentials, storage, initialize_app
 import qrcode
 import base64
 import io
