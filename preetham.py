@@ -10,9 +10,11 @@ import os
 import json
 import tempfile
 
-# Initialize Firebase app
-# Download the JSON file from the GitHub repository
 response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
+
+# Save the JSON content as a dictionary
+json_data = json.loads(response.text)
+response = requests.get(json_data)
 
 # Initialize Firebase app
 cred = credentials.Certificate("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
