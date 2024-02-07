@@ -14,10 +14,8 @@ response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_
 
 # Save the JSON content as a dictionary
 json_data = json.loads(response.text)
-response = requests.get(json_data)
-
 # Initialize Firebase app
-cred = credentials.Certificate("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
+cred = credentials.Certificate(json_data)
 firebase_app = initialize_app(cred)
 bucket = storage.bucket(app=firebase_app)
 
