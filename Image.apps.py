@@ -9,9 +9,13 @@ import streamlit as st
 from PIL import Image
 import firebase_admin
 from firebase_admin import credentials, storage
+import requests
 
 # Initialize Firebase
-cred = credentials.Certificate("https://raw.githubusercontent.com/Sagarnr1997/Image_app/main/imageapp.json")
+url = "https://raw.githubusercontent.com/Sagarnr1997/Image_app/main/imageapp.json"
+# Fetch the contents of the URL
+response = requests.get(url)
+cred = credentials.Certificate(response)
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'gs://imageapp-d473e.appspot.com'
 })
