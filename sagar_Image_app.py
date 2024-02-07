@@ -1,74 +1,34 @@
 import streamlit as st
 from PIL import Image
 import io
+from google.oauth2 import service_account
+from googleapiclient.http import MediaIoBaseUpload
+
+# Path to your credentials file
+credentials_path = 'client_secret.json'
+
+# Function to authenticate with Google Drive
+def authenticate_drive():
+    creds = service_account.Credentials.from_service_account_file(credentials_path, scopes=['https://www.googleapis.com/auth/drive'])
+    return creds
+
+# Function to upload image to Google Drive
+def upload_to_drive(image):
+    drive_service = build('drive', 'v3', credentials=authenticate_drive())
+
+    file_metadata = {
+        'name': 'uploaded_image.jpg', # Change the file name if needed
+        'mimeType': 'image/jpeg'
+    }
+    media = MediaIoBaseUpload(image, mimetype='image/jpeg')
+
+    file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    return file.get('id')
 
 # JavaScript function for client-side image resizing and compression
 js_code = """
 <script>
-function compressAndUpload(files) {
-    var compressedFiles = [];
-    var maxSize = 1024; // Maximum file size in KB
-
-    for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        var fileName = file.name;
-        var reader = new FileReader();
-
-        reader.onload = function(event) {
-            var img = new Image();
-            img.src = event.target.result;
-
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                var ctx = canvas.getContext('2d');
-                var maxWidth = 800; // Maximum width for the image
-                var maxHeight = 600; // Maximum height for the image
-                var ratio = 1;
-
-                if (img.width > maxWidth) {
-                    ratio = maxWidth / img.width;
-                } else if (img.height > maxHeight) {
-                    ratio = maxHeight / img.height;
-                }
-
-                canvas.width = img.width * ratio;
-                canvas.height = img.height * ratio;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                canvas.toBlob(function(blob) {
-                    var compressedFile = new File([blob], fileName, {type: 'image/jpeg'});
-                    compressedFiles.push(compressedFile);
-
-                    if (compressedFiles.length === files.length) {
-                        uploadCompressedFiles(compressedFiles);
-                    }
-                }, 'image/jpeg', 0.7); // Compression quality (0.7 is 70%)
-            }
-        };
-
-        reader.readAsDataURL(file);
-    }
-}
-
-function uploadCompressedFiles(files) {
-    var formData = new FormData();
-
-    for (var i = 0; i < files.length; i++) {
-        formData.append('file', files[i]);
-    }
-
-    // You can perform an AJAX request to upload the compressed files
-    // Example: Use fetch() or XMLHttpRequest to send formData to your server
-    // fetch('/upload', {
-    //     method: 'POST',
-    //     body: formData
-    // })
-    // .then(response => {
-    //     console.log('Upload complete!');
-    // });
-
-    console.log('Compressed files ready for upload:', files);
-}
+// Your JavaScript code goes here
 </script>
 """
 
@@ -100,6 +60,10 @@ def main():
 
             # Display the image with a checkbox for selection
             st.write(f"<label for='img_{idx}'><img id='img_{idx}' src='data:image/png;base64,{compressed_img}' /></label><br>", unsafe_allow_html=True)
+
+            # Upload the image to Google Drive
+            file_id = upload_to_drive(compressed_img)
+            st.write(f"Image {idx + 1} uploaded to Google Drive. File ID: {file_id}")
 
         st.write("</div>")
         
