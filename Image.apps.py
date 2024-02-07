@@ -12,10 +12,7 @@ from firebase_admin import credentials, storage
 import requests
 
 # Initialize Firebase
-url = "https://sagarnr1997.github.io/firebase_api/imageapp.json"
-# Fetch the contents of the URL
-response = requests.get(url)
-cred = credentials.Certificate(response)
+cred = credentials.Certificate("https://sagarnr1997.github.io/firebase_api/imageapp.json")
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'gs://imageapp-d473e.appspot.com'
 })
