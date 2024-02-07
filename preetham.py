@@ -14,12 +14,18 @@ response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_
 
 # Save the JSON content as a dictionary
 json_data = json.loads(response.text)
-# Initialize Firebase app
-cred = credentials.Certificate(json_data)
-firebase_admin.initialize_app(cred, {
+
+try:
+    default_app = firebase_admin.get_app()
+except ValueError:
+    # Use the JSON data to initialize the Firebase app
+    cred = credentials.Certificate(json_data)
+    firebase_admin.initialize_app(cred, {
         'name': 'Imageapp',  # Add a unique app name
         'storageBucket': 'imageapp-d473e.appspot.com'
     })
+
+# Initialize Firebase Storage
 bucket = storage.bucket()
 
 def display_all_images():
