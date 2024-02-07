@@ -34,7 +34,11 @@ def upload_image_to_firebase(image_data):
 
         # Upload the base64-encoded string to Firebase Storage
         blob = bucket.blob("images/" + image_data.name)
-        blob.content_type = image_data.type
+        
+        # Specify the content type of the image
+        content_type = 'image/jpeg' if image_data.type == 'image/jpeg' else 'image/png'  # Adjust as needed
+        
+        blob.content_type = content_type
         blob.upload_from_string(image_string)
 
         # Get URL of the uploaded image
@@ -42,6 +46,7 @@ def upload_image_to_firebase(image_data):
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
         return None
+
 
 def main():
     st.title('Image Upload and QR Code Generator')
