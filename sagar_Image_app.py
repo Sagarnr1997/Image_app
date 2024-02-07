@@ -79,27 +79,8 @@ def compress_image(image, quality=50):
     img_io.seek(0)
     return img_io
 
-# Function to display uploaded images
-def display_images(uploaded_images):
-    st.write("## Uploaded Images")
-    for idx, img in enumerate(uploaded_images):
-        # Compress the image
-        compressed_img = compress_image(img)
-
-        # Download compressed image
-        st.write(f"### Download Compressed Image {idx + 1}")
-        st.download_button(
-            label=f"Download Image {idx + 1}",
-            data=compressed_img,
-            file_name=f"compressed_image_{idx + 1}.jpg",
-            mime="image/jpeg"
-        )
-
-        # Display the image
-        st.image(img, caption=f"Image {idx + 1}", use_column_width=True)
-
 def main():
-    st.title("Image Upload and Compression App")
+    st.title("Image Gallery and Selection")
 
     # Display the JavaScript code in the Streamlit app
     st.write(js_code, unsafe_allow_html=True)
@@ -109,7 +90,31 @@ def main():
     uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
     if uploaded_files:
         uploaded_images = [Image.open(img) for img in uploaded_files]
-        display_images(uploaded_images)
+
+        # Display images in a gallery-style format
+        st.write("## Image Gallery")
+        for img in uploaded_images:
+            st.image(img, caption='', use_column_width=True)
+
+        # Checkbox selection for images
+        selected_images = []
+        for idx, img in enumerate(uploaded_images):
+            if st.checkbox(f"Select Image {idx + 1}", key=f"checkbox_{idx}"):
+                selected_images.append(img)
+
+        # Download button for selected images
+        if st.button("Download Selected Images"):
+            for idx, img in enumerate(selected_images):
+                # Compress the image
+                compressed_img = compress_image(img)
+
+                # Download the compressed image
+                st.download_button(
+                    label=f"Download Image {idx + 1}",
+                    data=compressed_img,
+                    file_name=f"compressed_image_{idx + 1}.jpg",
+                    mime="image/jpeg"
+                )
 
 if __name__ == "__main__":
     main()
