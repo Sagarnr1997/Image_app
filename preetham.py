@@ -81,7 +81,7 @@ def main():
 
         if image_url:
             # Generate and display QR code
-            app_url = "https://example.com/imageapp"  # Update with your app URL
+            app_url = "https://console.firebase.google.com/project/imageapp-d473e/storage/imageapp-d473e.appspot.com/files"  # Update with your app URL
             qr_img = generate_qr_code(app_url)
             st.image(qr_img, caption='QR Code', use_column_width=True)
 
