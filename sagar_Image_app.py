@@ -80,7 +80,7 @@ def compress_image(image, quality=50):
     return img_io
 
 def main():
-    st.title("Image Gallery and Selection")
+    st.title("Mobile Gallery and Selection")
 
     # Display the JavaScript code in the Streamlit app
     st.write(js_code, unsafe_allow_html=True)
@@ -91,19 +91,26 @@ def main():
     if uploaded_files:
         uploaded_images = [Image.open(img) for img in uploaded_files]
 
-        # Display images in a gallery-style format
-        st.write("## Image Gallery")
-        for img in uploaded_images:
-            st.image(img, caption='', use_column_width=True)
-
-        # Checkbox selection for images
-        selected_images = []
+        # Display images in a mobile gallery format
+        st.write("<style> .gallery { display: flex; flex-wrap: wrap; } .gallery img { width: 100px; height: 100px; object-fit: cover; margin: 5px; cursor: pointer; } </style>", unsafe_allow_html=True)
+        st.write("<div class='gallery'>")
         for idx, img in enumerate(uploaded_images):
-            if st.checkbox(f"Select Image {idx + 1}", key=f"checkbox_{idx}"):
-                selected_images.append(img)
+            # Compress the image
+            compressed_img = compress_image(img)
 
+            # Display the image with a checkbox for selection
+            st.write(f"<label for='img_{idx}'><img id='img_{idx}' src='data:image/png;base64,{compressed_img}' /></label><br>", unsafe_allow_html=True)
+
+        st.write("</div>")
+        
         # Download button for selected images
         if st.button("Download Selected Images"):
+            selected_images = []
+            for idx, img in enumerate(uploaded_images):
+                checkbox_val = st.checkbox(f"Select Image {idx + 1}", key=f"checkbox_{idx}")
+                if checkbox_val:
+                    selected_images.append(img)
+
             for idx, img in enumerate(selected_images):
                 # Compress the image
                 compressed_img = compress_image(img)
