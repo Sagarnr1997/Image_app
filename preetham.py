@@ -15,7 +15,7 @@ import tempfile
 response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
 
 # Initialize Firebase app
-cred = credentials.Certificate(response)
+cred = credentials.Certificate("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
 firebase_app = initialize_app(cred)
 bucket = storage.bucket(app=firebase_app)
 
