@@ -2,6 +2,76 @@ import streamlit as st
 from PIL import Image
 import io
 
+# JavaScript function for client-side image resizing and compression
+js_code = """
+<script>
+function compressAndUpload(files) {
+    var compressedFiles = [];
+    var maxSize = 1024; // Maximum file size in KB
+
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var fileName = file.name;
+        var reader = new FileReader();
+
+        reader.onload = function(event) {
+            var img = new Image();
+            img.src = event.target.result;
+
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                var maxWidth = 800; // Maximum width for the image
+                var maxHeight = 600; // Maximum height for the image
+                var ratio = 1;
+
+                if (img.width > maxWidth) {
+                    ratio = maxWidth / img.width;
+                } else if (img.height > maxHeight) {
+                    ratio = maxHeight / img.height;
+                }
+
+                canvas.width = img.width * ratio;
+                canvas.height = img.height * ratio;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob(function(blob) {
+                    var compressedFile = new File([blob], fileName, {type: 'image/jpeg'});
+                    compressedFiles.push(compressedFile);
+
+                    if (compressedFiles.length === files.length) {
+                        uploadCompressedFiles(compressedFiles);
+                    }
+                }, 'image/jpeg', 0.7); // Compression quality (0.7 is 70%)
+            }
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+function uploadCompressedFiles(files) {
+    var formData = new FormData();
+
+    for (var i = 0; i < files.length; i++) {
+        formData.append('file', files[i]);
+    }
+
+    // You can perform an AJAX request to upload the compressed files
+    // Example: Use fetch() or XMLHttpRequest to send formData to your server
+    // fetch('/upload', {
+    //     method: 'POST',
+    //     body: formData
+    // })
+    // .then(response => {
+    //     console.log('Upload complete!');
+    // });
+
+    console.log('Compressed files ready for upload:', files);
+}
+</script>
+"""
+
 # Function to compress image
 def compress_image(image, quality=50):
     img_io = io.BytesIO()
@@ -12,31 +82,34 @@ def compress_image(image, quality=50):
 # Function to display uploaded images
 def display_images(uploaded_images):
     st.write("## Uploaded Images")
-    for img in uploaded_images:
-        st.image(img, use_column_width=True)
+    for idx, img in enumerate(uploaded_images):
+        # Compress the image
+        compressed_img = compress_image(img)
+
+        # Download compressed image
+        st.write(f"### Download Compressed Image {idx + 1}")
+        st.download_button(
+            label=f"Download Image {idx + 1}",
+            data=compressed_img,
+            file_name=f"compressed_image_{idx + 1}.jpg",
+            mime="image/jpeg"
+        )
+
+        # Display the image
+        st.image(img, caption=f"Image {idx + 1}", use_column_width=True)
 
 def main():
-    st.title("Image Upload and Display App")
+    st.title("Image Upload and Compression App")
 
-    # Upload multiple images
-    st.write("### Upload Images")
+    # Display the JavaScript code in the Streamlit app
+    st.write(js_code, unsafe_allow_html=True)
+
+    # Upload images and call the JavaScript function when files are selected
+    st.write("Upload Images")
     uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-
-    # Display uploaded images
     if uploaded_files:
         uploaded_images = [Image.open(img) for img in uploaded_files]
         display_images(uploaded_images)
-
-        # Compress and provide download links
-        st.write("### Download Compressed Images")
-        for idx, img in enumerate(uploaded_images):
-            compressed_img = compress_image(img)
-            st.download_button(
-                label=f"Download Image {idx + 1}",
-                data=compressed_img,
-                file_name=f"compressed_image_{idx + 1}.jpg",
-                mime="image/jpeg"
-            )
 
 if __name__ == "__main__":
     main()
