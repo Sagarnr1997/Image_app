@@ -3,6 +3,7 @@ from PIL import Image
 import io
 from google.oauth2 import service_account
 from googleapiclient.http import MediaIoBaseUpload
+from googleapiclient.discovery import build
 
 # Path to your credentials file
 credentials_path = 'client_secret.json'
