@@ -21,59 +21,23 @@ try:
         'storageBucket': 'imageapp-d473e.appspot.com'
     })
     bucket = storage.bucket(app=default_app)
-except ValueError:
-    st.error("Failed to initialize Firebase app.")
+except ValueError as e:
+    st.error(f"Failed to initialize Firebase app: {str(e)}")
 
 def display_all_images():
-    blobs_iterator = bucket.list_blobs()
-    blobs = list(blobs_iterator)
-    
-    if not blobs:
-        st.write("No images found.")
-        return
-    
-    for idx, blob in enumerate(blobs):
-        st.write(f"Image URL {idx + 1}: {blob.public_url}")
-        st.image(blob.public_url, caption=blob.name, use_column_width=True)
-
-def main():
-    st.title('All Images in Firebase Storage')
-
-    # Display all images in Firebase Storage
-    display_all_images()
-
-if __name__ == "__main__":
-    main()
-
-
-response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
-
-# Save the JSON content as a dictionary
-json_data = json.loads(response.text)
-
-try:
-    default_app = firebase_admin.get_app()
-except ValueError:
-    # Use the JSON data to initialize the Firebase app
-    cred = credentials.Certificate(json_data)
-    firebase_admin.initialize_app(cred, {
-        'name': 'Imageapp',  # Add a unique app name
-        'storageBucket': 'imageapp-d473e.appspot.com'
-    })
-
-# Initialize Firebase Storage
-bucket = storage.bucket()
-
-def display_all_images():
-    blobs_iterator = bucket.list_blobs(prefix="images/")
-    blobs = list(blobs_iterator)
-    
-    if not blobs:
-        st.write("No images found.")
-        return
-    
-    for blob in blobs:
-        st.image(blob.public_url, caption=blob.name, use_column_width=True)
+    try:
+        blobs_iterator = bucket.list_blobs()
+        blobs = list(blobs_iterator)
+        
+        if not blobs:
+            st.write("No images found.")
+            return
+        
+        for idx, blob in enumerate(blobs):
+            st.write(f"Image URL {idx + 1}: {blob.public_url}")
+            st.image(blob.public_url, caption=blob.name, use_column_width=True)
+    except NameError as e:
+        st.error("Firebase bucket is not defined. Make sure the app is initialized correctly.")
 
 def main():
     st.title('All Images in Firebase Storage')
