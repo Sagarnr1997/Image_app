@@ -26,7 +26,7 @@ except ValueError:
     cred = credentials.Certificate(json_data)
     firebase_admin.initialize_app(cred, {
         'name': 'Imageapp',  # Add a unique app name
-        'storageBucket': 'imageapp-d473e.appspot.com'
+        'storageBucket': 'https://console.firebase.google.com/project/imageapp-d473e/storage/imageapp-d473e.appspot.com/files'
     })
 
 # Initialize Firebase Storage
