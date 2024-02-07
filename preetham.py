@@ -18,7 +18,7 @@ json_data = json.loads(response.text)
 try:
     default_app = initialize_app(credentials.Certificate(json_data), {
         'name': 'Imageapp',
-        'storageBucket': 'imageapp-d473e.appspot.com'
+        'storageBucket': 'gs://preetham-c1ae2.appspot.com'
     })
     bucket = storage.bucket(app=default_app)
 except ValueError as e:
