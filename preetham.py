@@ -78,6 +78,8 @@ def display_all_images():
     download_buttons = []
 
     for idx, blob in enumerate(blobs):
+        st.write("Image URL:", blob.public_url)  # Print out the URL for debugging
+        
         cols[idx].image(blob.public_url, caption=blob.name, use_column_width=True)
 
         # Add a download button for each image
