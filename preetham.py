@@ -16,8 +16,11 @@ response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_
 json_data = json.loads(response.text)
 # Initialize Firebase app
 cred = credentials.Certificate(json_data)
-firebase_app = initialize_app(cred)
-bucket = storage.bucket(app=firebase_app)
+firebase_admin.initialize_app(cred, {
+        'name': 'Imageapp',  # Add a unique app name
+        'storageBucket': 'imageapp-d473e.appspot.com'
+    })
+bucket = storage.bucket()
 
 def display_all_images():
     blobs_iterator = bucket.list_blobs(prefix="images/")
