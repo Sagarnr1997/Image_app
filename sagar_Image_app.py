@@ -6,15 +6,12 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.discovery import build
 
 # Initialize Firebase app
-response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
+response = requests.get("https://github.com/Sagarnr1997/Image_app/blob/main/imapp.json")
 json_data = json.loads(response.text)
-
-# Path to your credentials file
-credentials_path = 'imapp.json'
 
 # Function to authenticate with Google Drive
 def authenticate_drive():
-    creds = service_account.Credentials.from_service_account_file(credentials_path, scopes=['https://www.googleapis.com/auth/drive'])
+    creds = service_account.Credentials.from_service_account_file(json_data, scopes=['https://www.googleapis.com/auth/drive'])
     return creds
 
 # Function to upload image to Google Drive
