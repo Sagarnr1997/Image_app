@@ -6,19 +6,25 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.discovery import build
 import requests
 import json
+import os
+import base64
 
-# Initialize Firebase app
-response = requests.get("https://github.com/Sagarnr1997/Image_app/blob/main/imapp.json")
-json_data = json.loads(response.text)
+def download_json_file(url, output_path):
+    response = requests.get(url)
+    with open(output_path, 'w') as json_file:
+        json_file.write(response.text)
 
-# Function to authenticate with Google Drive
-def authenticate_drive():
-    creds = service_account.Credentials.from_service_account_file(json_data, scopes=['https://www.googleapis.com/auth/drive'])
+json_file_path = "imapp.json"
+if not os.path.exists(json_file_path):
+    url = "https://github.com/Sagarnr1997/Image_app/blob/main/imapp.json?raw=true"
+    download_json_file(url, json_file_path)
+
+def authenticate_drive(json_file_path):
+    creds = service_account.Credentials.from_service_account_file(json_file_path, scopes=['https://www.googleapis.com/auth/drive'])
     return creds
 
-# Function to upload image to Google Drive
-def upload_to_drive(image):
-    drive_service = build('drive', 'v3', credentials=authenticate_drive())
+def upload_to_drive(image, json_file_path):
+    drive_service = build('drive', 'v3', credentials=authenticate_drive(json_file_path))
 
     file_metadata = {
         'name': 'uploaded_image.jpg', # Change the file name if needed
@@ -29,14 +35,12 @@ def upload_to_drive(image):
     file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
     return file.get('id')
 
-# JavaScript function for client-side image resizing and compression
 js_code = """
 <script>
 // Your JavaScript code goes here
 </script>
 """
 
-# Function to compress image
 def compress_image(image, quality=50):
     img_io = io.BytesIO()
     image.save(img_io, format='JPEG', quality=quality)
@@ -46,32 +50,24 @@ def compress_image(image, quality=50):
 def main():
     st.title("Mobile Gallery and Selection")
 
-    # Display the JavaScript code in the Streamlit app
     st.write(js_code, unsafe_allow_html=True)
 
-    # Upload images and call the JavaScript function when files are selected
-    st.write("Upload Images")
     uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
     if uploaded_files:
         uploaded_images = [Image.open(img) for img in uploaded_files]
 
-        # Display images in a mobile gallery format
         st.write("<style> .gallery { display: flex; flex-wrap: wrap; } .gallery img { width: 100px; height: 100px; object-fit: cover; margin: 5px; cursor: pointer; } </style>", unsafe_allow_html=True)
         st.write("<div class='gallery'>")
         for idx, img in enumerate(uploaded_images):
-            # Compress the image
             compressed_img = compress_image(img)
 
-            # Display the image with a checkbox for selection
-            st.write(f"<label for='img_{idx}'><img id='img_{idx}' src='data:image/png;base64,{compressed_img}' /></label><br>", unsafe_allow_html=True)
+            st.write(f"<label for='img_{idx}'><img id='img_{idx}' src='data:image/jpeg;base64,{base64.b64encode(compressed_img.getvalue()).decode()}' /></label><br>", unsafe_allow_html=True)
 
-            # Upload the image to Google Drive
-            file_id = upload_to_drive(compressed_img)
+            file_id = upload_to_drive(compressed_img, json_file_path)
             st.write(f"Image {idx + 1} uploaded to Google Drive. File ID: {file_id}")
 
         st.write("</div>")
-        
-        # Download button for selected images
+
         if st.button("Download Selected Images"):
             selected_images = []
             for idx, img in enumerate(uploaded_images):
@@ -80,16 +76,22 @@ def main():
                     selected_images.append(img)
 
             for idx, img in enumerate(selected_images):
-                # Compress the image
                 compressed_img = compress_image(img)
+                img_bytes = compressed_img.getvalue()
 
-                # Download the compressed image
+                st.markdown(f"#### Download Image {idx + 1} ####")
                 st.download_button(
                     label=f"Download Image {idx + 1}",
-                    data=compressed_img,
+                    data=img_bytes,
                     file_name=f"compressed_image_{idx + 1}.jpg",
-                    mime="image/jpeg"
+                    mime="image/jpeg",
+                    key=f"download_button_{idx}"
                 )
+                st.write("")
+
+if st.button("Clear All"):
+    st.write("Clearing all images and selections...")
+    st.empty()
 
 if __name__ == "__main__":
     main()
