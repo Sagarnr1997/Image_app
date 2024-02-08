@@ -6,7 +6,7 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.discovery import build
 
 # Path to your credentials file
-credentials_path = 'client_secret.json'
+credentials_path = 'imapp.json'
 
 # Function to authenticate with Google Drive
 def authenticate_drive():
