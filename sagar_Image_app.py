@@ -2,7 +2,7 @@ import streamlit as st
 from PIL import Image
 import io
 from google.oauth2 import service_account
-from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseDownload, MediaIoBaseUpload
 from googleapiclient.discovery import build
 import requests
 import json
@@ -141,9 +141,16 @@ def main():
             img_io.seek(0)
             file_id = upload_to_drive(img_io, json_file_path)
             
-            # Add download icon
-            st.write(f"<img class='download-icon' src='https://cdn-icons-png.flaticon.com/512/747/747376.png' onclick='downloadImage(\"{img_io}\", \"image_{idx + 1}.jpg\")' />", unsafe_allow_html=True)
-            st.write("Image uploaded to Google Drive. File ID: ", file_id)
+            # Add download button for each image
+            if st.button(f"Download Image {idx + 1}"):
+                st.markdown(f"#### Download Image {idx + 1} ####")
+                st.download_button(
+                    label=f"Download Image {idx + 1}",
+                    data=img_io,
+                    file_name=f"image_{idx + 1}.jpg",
+                    mime="image/jpeg",
+                    key=f"download_button_{idx}"
+                )
 
     # Display images from Google Drive
     drive_files = list_drive_files(json_file_path)
@@ -154,10 +161,6 @@ def main():
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
                 st.image(img, caption=file['name'], use_column_width=True)
-
-if st.button("Clear All"):
-    st.write("Clearing all images and selections...")
-    st.empty()
 
 if __name__ == "__main__":
     main()
