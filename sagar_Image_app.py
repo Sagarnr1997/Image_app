@@ -5,6 +5,10 @@ from google.oauth2 import service_account
 from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.discovery import build
 
+# Initialize Firebase app
+response = requests.get("https://raw.githubusercontent.com/sagarnr1997/firebase_api/main/imageapp.json")
+json_data = json.loads(response.text)
+
 # Path to your credentials file
 credentials_path = 'imapp.json'
 
