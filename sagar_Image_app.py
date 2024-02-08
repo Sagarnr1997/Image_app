@@ -38,14 +38,50 @@ def upload_to_drive(image, json_file_path):
 js_code = """
 <script>
 // Your JavaScript code goes here
+// This function will compress the image using canvas and return the base64 encoded string
+function compressImage(base64Str, maxWidth, maxHeight, quality) {
+    var img = new Image();
+    img.src = base64Str;
+
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+
+    var width = img.width;
+    var height = img.height;
+
+    if (width > height) {
+        if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+        }
+    } else {
+        if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+        }
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+
+    return canvas.toDataURL('image/jpeg', quality);
+}
+
+// This function is called when the page is loaded
+window.onload = function() {
+    var images = document.querySelectorAll('.compressed-img');
+
+    images.forEach(function(image) {
+        var base64Str = image.src;
+        var compressedBase64 = compressImage(base64Str, 100, 100, 0.5);
+        image.src = compressedBase64;
+    });
+};
 </script>
 """
-
-def compress_image(image, quality=50):
-    img_io = io.BytesIO()
-    image.save(img_io, format='JPEG', quality=quality)
-    img_io.seek(0)
-    return img_io
 
 def main():
     st.title("Mobile Gallery and Selection")
@@ -59,12 +95,13 @@ def main():
         st.write("<style> .gallery { display: flex; flex-wrap: wrap; } .gallery img { width: 100px; height: 100px; object-fit: cover; margin: 5px; cursor: pointer; } </style>", unsafe_allow_html=True)
         st.write("<div class='gallery'>")
         for idx, img in enumerate(uploaded_images):
-            compressed_img = compress_image(img)
+            img_io = io.BytesIO()
+            img.save(img_io, format='JPEG', quality=100)
+            img_io.seek(0)
 
-            st.write(f"<label for='img_{idx}'><img id='img_{idx}' src='data:image/jpeg;base64,{base64.b64encode(compressed_img.getvalue()).decode()}' /></label><br>", unsafe_allow_html=True)
-
-            file_id = upload_to_drive(compressed_img, json_file_path)
-            st.write(f"Image {idx + 1} uploaded to Google Drive. File ID: {file_id}")
+            file_id = upload_to_drive(img_io, json_file_path)
+            st.image(img, caption=f"Image {idx + 1} uploaded to Google Drive. File ID: {file_id}", use_column_width=True)
+            st.write("")
 
         st.write("</div>")
 
@@ -76,13 +113,14 @@ def main():
                     selected_images.append(img)
 
             for idx, img in enumerate(selected_images):
-                compressed_img = compress_image(img)
-                img_bytes = compressed_img.getvalue()
+                img_io = io.BytesIO()
+                img.save(img_io, format='JPEG', quality=100)
+                img_io.seek(0)
 
                 st.markdown(f"#### Download Image {idx + 1} ####")
                 st.download_button(
                     label=f"Download Image {idx + 1}",
-                    data=img_bytes,
+                    data=img_io,
                     file_name=f"compressed_image_{idx + 1}.jpg",
                     mime="image/jpeg",
                     key=f"download_button_{idx}"
