@@ -127,9 +127,6 @@ window.onload = function() {
 def main():
     st.title("Mobile Gallery and Selection")
 
-    # Write JavaScript code
-    st.write(js_code, unsafe_allow_html=True)
-
     # File uploader for local images
     uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
     
@@ -157,9 +154,34 @@ def main():
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
                 
-                # Add download button below the image
+                # Display image
                 st.image(img, caption=file['name'], use_column_width=True)
-                st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
+                
+                # Download option for the image
+                st.markdown(get_binary_file_downloader_html(file['name'], img_data), unsafe_allow_html=True)
+
+# Function to create a download link for an image
+def get_binary_file_downloader_html(file_name, file_bytes):
+    b64 = base64.b64encode(file_bytes.getvalue()).decode()
+    custom_css = """
+        <style>
+            .download-link {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 10px;
+            }
+        </style>
+    """
+    dl_link = custom_css + '<a href="data:application/octet-stream;base64,{b64}" download="{file_name}" class="download-link">Download {file_name}</a>'
+    return dl_link.format(b64=b64, file_name=file_name)
 
 if __name__ == "__main__":
     main()
