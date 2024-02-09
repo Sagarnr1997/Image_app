@@ -60,10 +60,75 @@ def download_from_drive(file_id, json_file_path):
     downloaded_img.seek(0)
     return downloaded_img
 
+# JavaScript code for image compression and download
+js_code = """
+<script>
+// Function to prompt download on clicking the image
+function downloadImage(imageData, fileName) {
+    const link = document.createElement('a');
+    link.href = imageData;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// This function will compress the image using canvas and return the base64 encoded string
+function compressImage(base64Str, maxWidth, maxHeight, quality) {
+    var img = new Image();
+    img.src = base64Str;
+
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+
+    var width = img.width;
+    var height = img.height;
+
+    if (width > height) {
+        if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+        }
+    } else {
+        if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+        }
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+
+    return canvas.toDataURL('image/jpeg', quality);
+}
+
+// This function is called when the page is loaded
+window.onload = function() {
+    var images = document.querySelectorAll('.compressed-img');
+
+    images.forEach(function(image) {
+        var base64Str = image.src;
+        var compressedBase64 = compressImage(base64Str, 100, 100, 0.5);
+        image.src = compressedBase64;
+
+        // Add click event to download the image
+        image.addEventListener('click', function() {
+            downloadImage(compressedBase64, image.alt);
+        });
+    });
+};
+</script>
+"""
 
 # Main function
 def main():
     st.title("Mobile Gallery and Selection")
+
+    # Write JavaScript code
+    st.write(js_code, unsafe_allow_html=True)
 
     # File uploader for local images
     uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
@@ -92,39 +157,9 @@ def main():
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
                 
-                # Display image
+                # Add download button below the image
                 st.image(img, caption=file['name'], use_column_width=True)
-                
-                # Download option for the image
-                st.markdown(get_binary_file_downloader_html(file['name'], img_data), unsafe_allow_html=True)
-
-# Function to create a download link for an image
-def get_binary_file_downloader_html(file_name, img):
-    img_io = io.BytesIO()
-    img.save(img_io, format='JPEG')
-    img_bytes = img_io.getvalue()
-    
-    b64 = base64.b64encode(img_bytes).decode()
-    custom_css = """
-        <style>
-            .download-link {
-                background-color: #4CAF50;
-                border: none;
-                color: white;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 10px;
-            }
-        </style>
-    """
-    dl_link = custom_css + '<a href="data:application/octet-stream;base64,{b64}" download="{file_name}" class="download-link">Download {file_name}</a>'
-    return dl_link.format(b64=b64, file_name=file_name)
-
+                st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
