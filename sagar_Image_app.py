@@ -63,16 +63,6 @@ def download_from_drive(file_id, json_file_path):
 # JavaScript code for image compression and download
 js_code = """
 <script>
-// Function to prompt download on clicking download icon
-function downloadImage(imageData, fileName) {
-    const link = document.createElement('a');
-    link.href = imageData;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
 // This function will compress the image using canvas and return the base64 encoded string
 function compressImage(base64Str, maxWidth, maxHeight, quality) {
     var img = new Image();
@@ -115,28 +105,6 @@ window.onload = function() {
         image.src = compressedBase64;
     });
 };
-
-// Function to open the image in a new tab
-function openImageInTab(imageElement) {
-    var imageUrl = imageElement.src;
-    window.open(imageUrl, 'Image');
-}
-
-// Function to rotate the image
-function rotateImage(imageElement, degree) {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var img = new Image();
-    img.src = imageElement.src;
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate(degree * Math.PI / 180);
-    ctx.drawImage(img, -img.width / 2, -img.height / 2);
-    ctx.restore();
-    imageElement.src = canvas.toDataURL('image/jpeg');
-}
 </script>
 """
 
@@ -163,23 +131,13 @@ def main():
             img_io.seek(0)
             file_id = upload_to_drive(img_io, json_file_path)
 
-            # Add download icon for each image
-            img_data = img_io.getvalue()
-            st.markdown(f"<div style='text-align: center;'><a href='javascript:openImageInTab(document.querySelector(\".compressed-img:nth-child({idx + 1})\"))'><img src='https://image.flaticon.com/icons/png/512/88/88950.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
-
             # Add compressed image for each uploaded image
             img_io.seek(0)
             img = Image.open(img_io)
             img_io = io.BytesIO()
             img.save(img_io, format='JPEG', quality=50)
             img_io.seek(0)
-            st.markdown(f"<img src='data:image/jpeg;base64,{base64.b64encode(img_io.read()).decode()}' class='compressed-img' style='margin: 5px;'/>", unsafe_allow_html=True)
-
-            # Add rotation functionality
-            st.markdown(f"<div style='text-align: center;'><img src='https://image.flaticon.com/icons/png/512/1151/1151250.png' style='width: 24px; height: 24px;' title='Rotate counter-clockwise' onclick='rotateImage(document.querySelector(\".compressed-img:nth-child({idx + 1})\"), -90)'></div>", unsafe_allow_html=True)
-
-            # Add download functionality
-            st.markdown(f"<div style='text-align: center;'><a href='javascript:downloadImage(document.querySelector(\".compressed-img:nth-child({idx + 1})\").src, \"image{idx + 1}.jpg\")'><img src='https://image.flaticon.com/icons/png/512/94/94944.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
+            st.markdown("<img src='data:image/jpeg;base64," + base64.b64encode(img_io.read()).decode() + "' class='compressed-img' style='margin: 5px;'/>", unsafe_allow_html=True)
 
     # Display images from Google Drive
     drive_files = list_drive_files(json_file_path)
@@ -191,21 +149,11 @@ def main():
                 img = Image.open(img_data)
                 st.image(img, caption=file['name'], use_column_width=True)
 
-                # Add download icon for each image from Google Drive
-                img_data = img_data.getvalue()
-                st.markdown(f"<div style='text-align: center;'><a href='javascript:downloadImage(document.querySelector(\".compressed-img:nth-child({len(uploaded_files) + drive_files.index(file) + 1})\").src, \"{file['name']}\")'><img src='https://image.flaticon.com/icons/png/512/94/94944.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
-
                 # Add compressed image for each image from Google Drive
                 img_io = io.BytesIO()
                 img.save(img_io, format='JPEG', quality=50)
                 img_io.seek(0)
-                st.markdown(f"<img src='data:image/jpeg;base64,{base64.b64encode(img_io.read()).decode()}' class='compressed-img' style='margin: 5px;'/>", unsafe_allow_html=True)
-
-                # Add rotation functionality for each image from Google Drive
-                st.markdown(f"<div style='text-align: center;'><img src='https://image.flaticon.com/icons/png/512/1151/1151247.png' style='width: 24px; height: 24px;' title='Rotate clockwise' onclick='rotateImage(document.querySelector(\".compressed-img:nth-child({len(uploaded_files) + drive_files.index(file) + 1})\"), 90)'></div>", unsafe_allow_html=True)
-
-                # Add rotation functionality for each image from Google Drive
-                st.markdown(f"<div style='text-align: center;'><img src='https://image.flaticon.com/icons/png/512/1151/1151250.png' style='width: 24px; height: 24px;' title='Rotate counter-clockwise' onclick='rotateImage(document.querySelector(\".compressed-img:nth-child({len(uploaded_files) + drive_files.index(file) + 1})\"), -90)'></div>", unsafe_allow_html=True)
+                st.markdown("<img src='data:image/jpeg;base64," + base64.b64encode(img_io.read()).decode() + "' class='compressed-img' style='margin: 5px;'/>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
