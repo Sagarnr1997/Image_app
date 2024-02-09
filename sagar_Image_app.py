@@ -171,4 +171,6 @@ def main():
                 <div style='text-align: center;'><a href='data:application/octet-stream;base64,{}' download='{}'><span class='fa fa-download'></span></a></div>
                 """.format(base64.b64encode(img_data).decode(), file['name'], base64.b64encode(img_data).decode()), unsafe_allow_html=True)
 
+
 if __name__ == "__main__":
+    main()
