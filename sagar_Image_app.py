@@ -144,6 +144,9 @@ def main():
                 
                 # Display image
                 st.image(img, caption=file['name'], use_column_width=True)
+                
+                # Add download button for each image
+                st.markdown(f"Download [**{file['name']}**](data:image/jpeg;base64,{base64.b64encode(img_data.read()).decode()})", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
