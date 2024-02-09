@@ -60,7 +60,6 @@ def download_from_drive(file_id, json_file_path):
     downloaded_img.seek(0)
     return downloaded_img
 
-# JavaScript code for image compression and download
 js_code = """
 <script>
 // Function to prompt download on clicking the image
@@ -143,7 +142,10 @@ def main():
         st.write("Uploaded Images:")
         for idx, img_file in enumerate(uploaded_files):
             img = Image.open(img_file)
-            st.image(img, caption=f"Image {idx + 1}", use_column_width=True)
+            img_data = img_io.getvalue()
+            st.markdown("""<img src="data:image/jpeg;base64,{}" class="compressed-img" alt="uploaded_image_{}">
+            <div style='text-align: center;'><a href='data:application/octet-stream;base64,{}' download='uploaded_image_{}'><span class='fa fa-download'></span></a></div>
+            """.format(base64.b64encode(img_data).decode(), idx + 1, base64.b64encode(img_data).decode()), unsafe_allow_html=True)
             
             # Compress the image
             img_io = io.BytesIO()
@@ -163,9 +165,10 @@ def main():
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
                 
-                # Add download button below the image
-                st.image(img, caption=file['name'], use_column_width=True)
-                st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
+                img_data = img_data.getvalue()
+                st.markdown("""<img src="data:image/jpeg;base64,{}" class="compressed-img" alt="{}">
+                <div style='text-align: center;'><a href='data:application/octet-stream;base64,{}' download='{}'><span class='fa fa-download'></span></a></div>
+                """.format(base64.b64encode(img_data).decode(), file['name'], base64.b64encode(img_data).
 
 if __name__ == "__main__":
     main()
