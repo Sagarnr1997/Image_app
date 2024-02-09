@@ -63,7 +63,7 @@ def download_from_drive(file_id, json_file_path):
 # JavaScript code for image compression and download
 js_code = """
 <script>
-// Function to prompt download on clicking download icon
+// Function to prompt download on clicking the image
 function downloadImage(imageData, fileName) {
     const link = document.createElement('a');
     link.href = imageData;
@@ -135,22 +135,16 @@ def main():
             img = Image.open(img_file)
             st.image(img, caption=f"Image {idx + 1}", use_column_width=True)
             
-            # Upload image to Google Drive
+            # Compress the image
             img_io = io.BytesIO()
             img.save(img_io, format='JPEG', quality=100)
             img_io.seek(0)
-            file_id = upload_to_drive(img_io, json_file_path)
             
-            # Add download button for each image
-            if st.button(f"Download Image {idx + 1}"):
-                st.markdown(f"#### Download Image {idx + 1} ####")
-                st.download_button(
-                    label=f"Download Image {idx + 1}",
-                    data=img_io,
-                    file_name=f"image_{idx + 1}.jpg",
-                    mime="image/jpeg",
-                    key=f"download_button_{idx}"
-                )
+            # Upload image to Google Drive
+            file_id = upload_to_drive(img_io, json_file_path)
+
+            # Add JavaScript function to the image for downloading
+            st.write(f"<p onclick='downloadImage(\"{img_io}\", \"{img_file.name}\")'>Click here to download</p>", unsafe_allow_html=True)
 
     # Display images from Google Drive
     drive_files = list_drive_files(json_file_path)
