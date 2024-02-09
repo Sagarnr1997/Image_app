@@ -144,7 +144,8 @@ def main():
             img_io = io.BytesIO()
             img.save(img_io, format='JPEG', quality=100)
             img_io.seek(0)
-            
+            # Add download button below the uploaded image
+            st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_io.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
             # Upload image to Google Drive
             file_id = upload_to_drive(img_io, json_file_path)
 
