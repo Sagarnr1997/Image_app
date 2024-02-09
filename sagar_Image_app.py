@@ -113,6 +113,11 @@ window.onload = function() {
         var base64Str = image.src;
         var compressedBase64 = compressImage(base64Str, 100, 100, 0.5);
         image.src = compressedBase64;
+
+        // Add click event to download the image
+        image.addEventListener('click', function() {
+            downloadImage(compressedBase64, image.alt);
+        });
     });
 };
 </script>
@@ -142,9 +147,6 @@ def main():
             
             # Upload image to Google Drive
             file_id = upload_to_drive(img_io, json_file_path)
-
-            # Add JavaScript function to the image for downloading
-            st.write(f"<p onclick='downloadImage(\"{img_io}\", \"{img_file.name}\")'>Click here to download</p>", unsafe_allow_html=True)
 
     # Display images from Google Drive
     drive_files = list_drive_files(json_file_path)
