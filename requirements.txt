@@ -9,4 +9,3 @@ opencv-python-headless==4.5.5.64
 dlib==19.24.2
 cmake==3.28.1
 pyproject.toml == 0.0.10
-libx11-devel == 1.8.6
