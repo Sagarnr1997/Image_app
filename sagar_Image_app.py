@@ -121,8 +121,13 @@ window.onload = function() {
     });
 };
 </script>
+<style>
+.fa-download {
+    font-size: 18px;
+    color: #007bff;
+}
+</style>
 """
-
 # Main function
 def main():
     st.title("Mobile Gallery and Selection")
