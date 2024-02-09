@@ -60,7 +60,6 @@ def download_from_drive(file_id, json_file_path):
     downloaded_img.seek(0)
     return downloaded_img
 
-# JavaScript code for image compression and download
 js_code = """
 <script>
 // Function to prompt download on clicking the image
@@ -119,6 +118,15 @@ window.onload = function() {
             downloadImage(compressedBase64, image.alt);
         });
     });
+
+    var downloadIcons = document.querySelectorAll('.download-icon');
+    downloadIcons.forEach(function(icon) {
+        icon.addEventListener('click', function(event) {
+            var imageAlt = event.target.getAttribute('data-image-alt');
+            var imageData = event.target.getAttribute('data-image-data');
+            downloadImage(imageData, imageAlt);
+        });
+    });
 };
 </script>
 """
@@ -159,7 +167,7 @@ def main():
                 
                 # Add download button below the image
                 st.image(img, caption=file['name'], use_column_width=True)
-                st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://www.freeiconspng.com/uploads/download-icon-png-5.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align: center;'><img src='https://www.freeiconspng.com/uploads/download-icon-png-5.png' style='width: 24px; height: 24px;' class='download-icon' data-image-alt='{file['name']}' data-image-data='{base64.b64encode(img_data.getvalue()).decode()}'></div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
