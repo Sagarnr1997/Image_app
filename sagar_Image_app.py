@@ -108,6 +108,12 @@ window.onload = function() {
 </script>
 """
 
+# Function to create a downloadable link for an image
+def get_image_download_link(img_data, filename, text):
+    b64 = base64.b64encode(img_data.getvalue()).decode()
+    href = f'<a href="data:file/jpg;base64,{b64}" download="{filename}">{text}</a>'
+    return href
+
 # Main function
 def main():
     st.title("Mobile Gallery and Selection")
@@ -146,7 +152,7 @@ def main():
                 st.image(img, caption=file['name'], use_column_width=True)
                 
                 # Add download button for each image
-                st.markdown(f"Download [**{file['name']}**](data:image/jpeg;base64,{base64.b64encode(img_data.read()).decode()})", unsafe_allow_html=True)
+                st.markdown(get_image_download_link(img_data, file['name'], f"Download {file['name']}"), unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
