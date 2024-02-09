@@ -60,6 +60,7 @@ def download_from_drive(file_id, json_file_path):
     downloaded_img.seek(0)
     return downloaded_img
 
+# JavaScript code for image compression and download
 js_code = """
 <script>
 // Function to prompt download on clicking the image
@@ -72,53 +73,8 @@ function downloadImage(imageData, fileName) {
     document.body.removeChild(link);
 }
 
-// This function will compress the image using canvas and return the base64 encoded string
-function compressImage(base64Str, maxWidth, maxHeight, quality) {
-    var img = new Image();
-    img.src = base64Str;
-
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-
-    var width = img.width;
-    var height = img.height;
-
-    if (width > height) {
-        if (width > maxWidth) {
-            height *= maxWidth / width;
-            width = maxWidth;
-        }
-    } else {
-        if (height > maxHeight) {
-            width *= maxHeight / height;
-            height = maxHeight;
-        }
-    }
-
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(img, 0, 0, width, height);
-
-    return canvas.toDataURL('image/jpeg', quality);
-}
-
 // This function is called when the page is loaded
 window.onload = function() {
-    var images = document.querySelectorAll('.compressed-img');
-
-    images.forEach(function(image) {
-        var base64Str = image.src;
-        var compressedBase64 = compressImage(base64Str, 100, 100, 0.5);
-        image.src = compressedBase64;
-
-        // Add click event to download the image
-        image.addEventListener('click', function() {
-            downloadImage(compressedBase64, image.alt);
-        });
-    });
-
     var downloadIcons = document.querySelectorAll('.download-icon');
     downloadIcons.forEach(function(icon) {
         icon.addEventListener('click', function(event) {
@@ -146,14 +102,9 @@ def main():
         st.write("Uploaded Images:")
         for idx, img_file in enumerate(uploaded_files):
             img = Image.open(img_file)
-            st.image(img, caption=f"Image {idx + 1}", use_column_width=True)
-            
-            # Compress the image
             img_io = io.BytesIO()
             img.save(img_io, format='JPEG', quality=100)
             img_io.seek(0)
-            
-            # Upload image to Google Drive
             file_id = upload_to_drive(img_io, json_file_path)
 
     # Display images from Google Drive
@@ -165,9 +116,15 @@ def main():
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
                 
-                # Add download button below the image
+                # Display image with download icon
                 st.image(img, caption=file['name'], use_column_width=True)
-                st.markdown(f"<div style='text-align: center;'><img src='https://www.freeiconspng.com/uploads/download-icon-png-5.png' style='width: 24px; height: 24px;' class='download-icon' data-image-alt='{file['name']}' data-image-data='{base64.b64encode(img_data.getvalue()).decode()}'></div>", unsafe_allow_html=True)
+                st.markdown(f"""
+                    <div style='text-align: center;'>
+                        <a href='data:application/octet-stream;base64,{base64.b64encode(img_data.getvalue()).decode()}' download='{file['name']}'>
+                            <img src='https://www.freeiconspng.com/uploads/download-icon-png-5.png' style='width: 24px; height: 24px;' class='download-icon' data-image-alt='{file['name']}' data-image-data='{base64.b64encode(img_data.getvalue()).decode()}'>
+                        </a>
+                    </div>
+                """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
