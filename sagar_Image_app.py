@@ -163,7 +163,7 @@ def main():
             img_io.seek(0)
             st.markdown("<img src='data:image/jpeg;base64," + base64.b64encode(img_io.read()).decode() + "' class='compressed-img' style='margin: 5px;'/>", unsafe_allow_html=True)
 
-                // Add rotation functionality
+    // Add rotation functionality
     st.markdown("<div style='text-align: center;'><img src='https://image.flaticon.com/icons/png/512/1151/1151250.png' style='width: 24px; height: 24px;' title='Rotate counter-clockwise' onclick='rotateImage(document.querySelector(\".compressed-img:nth-child(" + str(idx + 1) + ")\"), -90)'></div>", unsafe_allow_html=True)
 
     # Add download functionality
