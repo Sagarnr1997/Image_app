@@ -169,7 +169,7 @@ def main():
                 img_data = img_data.getvalue()
                 st.markdown("""<img src="data:image/jpeg;base64,{}" class="compressed-img" alt="{}">
                 <div style='text-align: center;'><a href='data:application/octet-stream;base64,{}' download='{}'><span class='fa fa-download'></span></a></div>
-                """.format(base64.b64encode(img_data).decode(), file['name'], base64.b64encode(img_data).decode()), unsafe_allow_html=True)
+                """.format(base64.b64encode(img_data).decode(), file['name'], base64.b64encode(img_data).decode()), unsafe_allow_html=True).
 
 
 if __name__ == "__main__":
