@@ -161,7 +161,6 @@ def main():
                 st.markdown(get_binary_file_downloader_html(file['name'], img_data), unsafe_allow_html=True)
 
 # Function to create a download link for an image
-# Function to create a download link for an image
 def get_binary_file_downloader_html(file_name, img):
     img_io = io.BytesIO()
     img.save(img_io, format='JPEG')
