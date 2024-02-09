@@ -73,38 +73,6 @@ function downloadImage(imageData, fileName) {
     document.body.removeChild(link);
 }
 
-// This function will compress the image using canvas and return the base64 encoded string
-function compressImage(base64Str, maxWidth, maxHeight, quality) {
-    var img = new Image();
-    img.src = base64Str;
-
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-
-    var width = img.width;
-    var height = img.height;
-
-    if (width > height) {
-        if (width > maxWidth) {
-            height *= maxWidth / width;
-            width = maxWidth;
-        }
-    } else {
-        if (height > maxHeight) {
-            width *= maxHeight / height;
-            height = maxHeight;
-        }
-    }
-
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(img, 0, 0, width, height);
-
-    return canvas.toDataURL('image/jpeg', quality);
-}
-
 // This function is called when the page is loaded
 window.onload = function() {
     var downloadIcons = document.querySelectorAll('.download-icon');
@@ -114,13 +82,6 @@ window.onload = function() {
             var imageData = event.target.getAttribute('data-image-data');
             downloadImage(imageData, imageAlt);
         });
-    });
-
-    var images = document.querySelectorAll('.compressed-img');
-    images.forEach(function(image) {
-        var base64Str = image.src;
-        var compressedBase64 = compressImage(base64Str, 100, 100, 0.5);
-        image.src = compressedBase64;
     });
 };
 </script>
