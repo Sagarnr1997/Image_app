@@ -63,7 +63,7 @@ def download_from_drive(file_id, json_file_path):
 # JavaScript code for image compression and download
 js_code = """
 <script>
-// Function to prompt download on clicking the image
+// Function to prompt download on clicking download icon
 function downloadImage(imageData, fileName) {
     const link = document.createElement('a');
     link.href = imageData;
@@ -113,11 +113,6 @@ window.onload = function() {
         var base64Str = image.src;
         var compressedBase64 = compressImage(base64Str, 100, 100, 0.5);
         image.src = compressedBase64;
-
-        // Add click event to download the image
-        image.addEventListener('click', function() {
-            downloadImage(compressedBase64, image.alt);
-        });
     });
 };
 </script>
@@ -140,13 +135,15 @@ def main():
             img = Image.open(img_file)
             st.image(img, caption=f"Image {idx + 1}", use_column_width=True)
             
-            # Compress the image
+            # Upload image to Google Drive
             img_io = io.BytesIO()
             img.save(img_io, format='JPEG', quality=100)
             img_io.seek(0)
-            
-            # Upload image to Google Drive
             file_id = upload_to_drive(img_io, json_file_path)
+            
+            # Add download icon for each image
+            img_data = img_io.getvalue()
+            st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data).decode() + "' download><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
 
     # Display images from Google Drive
     drive_files = list_drive_files(json_file_path)
@@ -156,10 +153,7 @@ def main():
             if 'image' in file['mimeType']:
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
-                
-                # Add download icon above the image
                 st.image(img, caption=file['name'], use_column_width=True)
-                st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
