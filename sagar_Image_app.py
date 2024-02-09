@@ -156,7 +156,10 @@ def main():
             if 'image' in file['mimeType']:
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
+                
+                # Add download icon above the image
                 st.image(img, caption=file['name'], use_column_width=True)
+                st.markdown("<div style='text-align: center;'><a href='" + img_data + "' download><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
