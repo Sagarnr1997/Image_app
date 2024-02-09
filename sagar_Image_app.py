@@ -172,4 +172,3 @@ def main():
                 """.format(base64.b64encode(img_data).decode(), file['name'], base64.b64encode(img_data).decode()), unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    main()
