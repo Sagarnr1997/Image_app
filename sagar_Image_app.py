@@ -159,7 +159,7 @@ def main():
                 
                 # Add download button below the image
                 st.image(img, caption=file['name'], use_column_width=True)
-                st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://icons.iconarchive.com/icons/martz90/circle-addon2/512/downloads-icon.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
+                st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://www.freeiconspng.com/uploads/download-icon-png-5.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
