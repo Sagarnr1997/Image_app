@@ -107,17 +107,20 @@ function compressImage(base64Str, maxWidth, maxHeight, quality) {
 
 // This function is called when the page is loaded
 window.onload = function() {
-    var images = document.querySelectorAll('.compressed-img');
+    var downloadIcons = document.querySelectorAll('.download-icon');
+    downloadIcons.forEach(function(icon) {
+        icon.addEventListener('click', function(event) {
+            var imageAlt = event.target.getAttribute('data-image-alt');
+            var imageData = event.target.getAttribute('data-image-data');
+            downloadImage(imageData, imageAlt);
+        });
+    });
 
+    var images = document.querySelectorAll('.compressed-img');
     images.forEach(function(image) {
         var base64Str = image.src;
         var compressedBase64 = compressImage(base64Str, 100, 100, 0.5);
         image.src = compressedBase64;
-
-        // Add click event to download the image
-        image.addEventListener('click', function() {
-            downloadImage(compressedBase64, image.alt);
-        });
     });
 };
 </script>
@@ -138,14 +141,9 @@ def main():
         st.write("Uploaded Images:")
         for idx, img_file in enumerate(uploaded_files):
             img = Image.open(img_file)
-            st.image(img, caption=f"Image {idx + 1}", use_column_width=True)
-            
-            # Compress the image
             img_io = io.BytesIO()
             img.save(img_io, format='JPEG', quality=100)
             img_io.seek(0)
-            
-            # Upload image to Google Drive
             file_id = upload_to_drive(img_io, json_file_path)
 
     # Display images from Google Drive
@@ -156,7 +154,16 @@ def main():
             if 'image' in file['mimeType']:
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
+                
+                # Display image with download icon
                 st.image(img, caption=file['name'], use_column_width=True)
+                st.markdown(f"""
+                    <div style='text-align: center;'>
+                        <a href='data:application/octet-stream;base64,{base64.b64encode(img_data.getvalue()).decode()}' download='{file['name']}'>
+                            <img src='https://www.freeiconspng.com/uploads/download-icon-png-5.png' style='width: 24px; height: 24px;' class='download-icon' data-image-alt='{file['name']}' data-image-data='{base64.b64encode(img_data.getvalue()).decode()}'>
+                        </a>
+                    </div>
+                """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
