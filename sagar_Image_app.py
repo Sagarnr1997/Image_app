@@ -161,8 +161,13 @@ def main():
                 st.markdown(get_binary_file_downloader_html(file['name'], img_data), unsafe_allow_html=True)
 
 # Function to create a download link for an image
-def get_binary_file_downloader_html(file_name, file_bytes):
-    b64 = base64.b64encode(file_bytes.getvalue()).decode()
+# Function to create a download link for an image
+def get_binary_file_downloader_html(file_name, img):
+    img_io = io.BytesIO()
+    img.save(img_io, format='JPEG')
+    img_bytes = img_io.getvalue()
+    
+    b64 = base64.b64encode(img_bytes).decode()
     custom_css = """
         <style>
             .download-link {
@@ -182,6 +187,7 @@ def get_binary_file_downloader_html(file_name, file_bytes):
     """
     dl_link = custom_css + '<a href="data:application/octet-stream;base64,{b64}" download="{file_name}" class="download-link">Download {file_name}</a>'
     return dl_link.format(b64=b64, file_name=file_name)
+
 
 if __name__ == "__main__":
     main()
