@@ -162,4 +162,4 @@ def main():
                 st.markdown("<div style='text-align: center;'><a href='data:application/octet-stream;base64," + base64.b64encode(img_data.getvalue()).decode() + "' download='" + file['name'] + "'><img src='https://image.flaticon.com/icons/png/512/1828/1828704.png' style='width: 24px; height: 24px;'></a></div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    main()) 
+    main()
