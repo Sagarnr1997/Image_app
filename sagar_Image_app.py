@@ -142,8 +142,8 @@ def main():
                 img_data = download_from_drive(file['id'], json_file_path)
                 img = Image.open(img_data)
                 
-                # Display image
-                st.image(img, caption=file['name'], use_column_width=True)
+                # Display image with full size on click
+                st.image(img, caption=file['name'], use_column_width=False)
 
 if __name__ == "__main__":
     main()
